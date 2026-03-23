@@ -3,6 +3,7 @@ import Chat from "./Chat.jsx";
 import { useState, useContext, useEffect } from "react";
 import { MyContext } from "./MyContext.jsx";
 import { SyncLoader } from "react-spinners";
+import { authFetch } from "./utils/api";
 
 function ChatWindow() {
     const { prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats } = useContext(MyContext);
@@ -15,11 +16,8 @@ function ChatWindow() {
         setLoading(true);
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat", {
+            const response = await authFetch("http://localhost:8080/api/chat", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 body: JSON.stringify({
                     message: prompt,
                     threadId: currThreadId
@@ -28,6 +26,7 @@ function ChatWindow() {
 
             const res = await response.json();
             setReply(res.reply);
+
         } catch (err) {
             console.log(err);
         }
@@ -47,8 +46,9 @@ function ChatWindow() {
         setPrompt("");
     }, [reply]);
 
-    const handleProfileClick = () => {
-        setIsOpen(prev => !prev);
+    const logout = () => {
+        localStorage.removeItem("token");
+        window.location.reload();
     };
 
     const isEmpty = !prevChats || prevChats.length === 0;
@@ -56,92 +56,58 @@ function ChatWindow() {
     return (
         <div className="chatWindow">
 
-            {/* NAVBAR */}
             <div className="navbar">
-                <span>
-                    DemoGPT <i className="fa-solid fa-chevron-down"></i>
-                </span>
+                <span>DemoGPT</span>
 
-                <div className="userIconDiv" onClick={handleProfileClick}>
+                <div className="userIconDiv" onClick={() => setIsOpen(prev => !prev)}>
                     <span className="userIcon">
                         <i className="fa-solid fa-user"></i>
                     </span>
                 </div>
             </div>
 
-            {/* DROPDOWN */}
             {isOpen && (
                 <div className="dropDown">
-                    <div className="dropDownItem">
-                        <i className="fa-solid fa-gear"></i> Settings
-                    </div>
-                    <div className="dropDownItem">
-                        <i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan
-                    </div>
-                    <div className="dropDownItem">
+                    <div className="dropDownItem" onClick={logout}>
                         <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
                     </div>
                 </div>
             )}
 
-            {/* CENTER STATE */}
             {isEmpty && (
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        gap: "16px",
-                        textAlign: "center",
-                        pointerEvents: "none" // ✅ FIX: allow clicks through
-                    }}
-                >
-                    {!loading && (
-                        <h1 style={{ color: "#fff", fontSize: "42px", fontWeight: "600" }}>
-                            Start a New Chat!
-                        </h1>
-                    )}
-
-                    {loading && (
-                        <>
-                            <h1 style={{ color: "#fff", fontSize: "42px", fontWeight: "600" }}>
-                                Start a New Chat!
-                            </h1>
-                            <SyncLoader color="#ffffff" />
-                        </>
-                    )}
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    gap: "16px",
+                    pointerEvents: "none"
+                }}>
+                    {!loading && <h1 style={{ color: "#fff", fontSize: "42px" }}>Start a New Chat!</h1>}
+                    {loading && <SyncLoader color="#fff" />}
                 </div>
             )}
 
-            {/* CHAT */}
             <Chat />
 
-            {/* INPUT */}
             <div className="chatInput">
                 <div className="inputBox">
                     <input
                         placeholder="Ask anything"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") getReply();
-                        }}
+                        onKeyDown={(e) => e.key === "Enter" && getReply()}
                     />
 
                     <div id="submit" onClick={getReply}>
                         <i className="fa-solid fa-paper-plane"></i>
                     </div>
                 </div>
-
-                <p className="info">
-                    DemoGPT can make mistakes. Check important info.
-                </p>
             </div>
 
         </div>

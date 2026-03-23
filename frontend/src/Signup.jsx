@@ -1,14 +1,28 @@
 import "./Auth.css";
 import { useState } from "react";
 
-function Signup() {
+function Signup({ switchToLogin }) { // ✅ accept prop
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        console.log(name, email, password);
+
+        const res = await fetch("http://localhost:8080/api/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        // optional: auto login after signup
+        if (data.message) {
+            switchToLogin(); // ✅ go back to login
+        }
     };
 
     return (
@@ -48,7 +62,9 @@ function Signup() {
 
                 <p className="auth-footer">
                     Already have an account?
-                    <span className="auth-link"> Login</span>
+                    <span className="auth-link" onClick={switchToLogin}>
+                        Login
+                    </span>
                 </p>
 
             </div>

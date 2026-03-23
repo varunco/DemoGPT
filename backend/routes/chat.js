@@ -1,11 +1,12 @@
 import express from "express";
 import Thread from "../models/Threads.js";
 import getOpenAIAPIResponse from "../utils/openai.js";
+import authMiddleware from "../middleware/auth.js"; // ✅ NEW
 
 const router = express.Router();
 
 
-// 🧪 TEST ROUTE
+// 🧪 TEST ROUTE (optional - can keep unprotected)
 router.post("/test", async (req, res) => {
   try {
     const thread = new Thread({
@@ -23,10 +24,12 @@ router.post("/test", async (req, res) => {
 });
 
 
-// 📥 GET ALL THREADS
-router.get("/thread", async (req, res) => {
+// 📥 GET ALL THREADS (USER-SPECIFIC)
+router.get("/thread", authMiddleware, async (req, res) => {
   try {
-    const threads = await Thread.find({}).sort({ updatedAt: -1 });
+    const threads = await Thread.find({ userId: req.user.userId }) // ✅ filter by user
+      .sort({ updatedAt: -1 });
+
     res.json(threads);
   } catch (err) {
     console.log(err);
@@ -35,18 +38,20 @@ router.get("/thread", async (req, res) => {
 });
 
 
-// 📥 GET SINGLE THREAD (IMPORTANT FIX)
-router.get("/thread/:threadId", async (req, res) => {
+// 📥 GET SINGLE THREAD (SECURE)
+router.get("/thread/:threadId", authMiddleware, async (req, res) => {
   const { threadId } = req.params;
 
   try {
-    const thread = await Thread.findOne({ threadId });
+    const thread = await Thread.findOne({
+      threadId,
+      userId: req.user.userId // ✅ ensure ownership
+    });
 
     if (!thread) {
       return res.status(404).json({ error: "Thread not found" });
     }
 
-    // ✅ return full thread (not just messages)
     res.json(thread);
 
   } catch (err) {
@@ -56,12 +61,15 @@ router.get("/thread/:threadId", async (req, res) => {
 });
 
 
-// ❌ DELETE THREAD
-router.delete("/thread/:threadId", async (req, res) => {
+// ❌ DELETE THREAD (SECURE)
+router.delete("/thread/:threadId", authMiddleware, async (req, res) => {
   const { threadId } = req.params;
 
   try {
-    const deletedThread = await Thread.findOneAndDelete({ threadId });
+    const deletedThread = await Thread.findOneAndDelete({
+      threadId,
+      userId: req.user.userId // ✅ only delete own thread
+    });
 
     if (!deletedThread) {
       return res.status(404).json({ error: "Thread not found" });
@@ -76,8 +84,8 @@ router.delete("/thread/:threadId", async (req, res) => {
 });
 
 
-// 💬 CHAT ROUTE (MAIN FIX)
-router.post("/chat", async (req, res) => {
+// 💬 CHAT ROUTE (SECURE + USER LINKED)
+router.post("/chat", authMiddleware, async (req, res) => {
   const { threadId, message } = req.body;
 
   if (!threadId || !message) {
@@ -85,13 +93,17 @@ router.post("/chat", async (req, res) => {
   }
 
   try {
-    let thread = await Thread.findOne({ threadId });
+    let thread = await Thread.findOne({
+      threadId,
+      userId: req.user.userId // ✅ only access own thread
+    });
 
     // 🆕 CREATE THREAD IF NOT EXISTS
     if (!thread) {
       thread = new Thread({
         threadId,
-        title: message, // first message becomes title
+        userId: req.user.userId, // ✅ LINK THREAD TO USER
+        title: message,
         messages: []
       });
     }
@@ -105,7 +117,7 @@ router.post("/chat", async (req, res) => {
     // 🤖 GET AI RESPONSE
     const assistantReply = await getOpenAIAPIResponse(message);
 
-    // 🤖 SAVE AI MESSAGE (IMPORTANT FIX)
+    // 🤖 SAVE AI MESSAGE
     thread.messages.push({
       role: "assistant",
       content: assistantReply

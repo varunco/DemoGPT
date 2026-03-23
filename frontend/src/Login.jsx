@@ -1,13 +1,27 @@
 import "./Auth.css";
 import { useState } from "react";
 
-function Login() {
+function Login({ switchToSignup }) { // ✅ accept prop
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        console.log(email, password);
+
+        const res = await fetch("http://localhost:8080/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            window.location.reload();
+        }
     };
 
     return (
@@ -39,7 +53,9 @@ function Login() {
 
                 <p className="auth-footer">
                     Don’t have an account?
-                    <span className="auth-link"> Sign up</span>
+                    <span className="auth-link" onClick={switchToSignup}>
+                        Sign up
+                    </span>
                 </p>
 
             </div>

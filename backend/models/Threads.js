@@ -1,16 +1,16 @@
 import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema({
-    role:{
+    role: {
         type: String,
-        enum: ["user","assistant"],
+        enum: ["user", "assistant"],
         required: true
     },
-    content:{
+    content: {
         type: String,
         required: true
     },
-    timestamp:{
+    timestamp: {
         type: Date,
         default: Date.now
     }
@@ -23,14 +23,25 @@ const ThreadSchema = new mongoose.Schema({
         unique: true,
         index: true
     },
-    title:{
-        type: String,
-        default:"New Chat",
+
+    // 🔥 NEW: link thread to user
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true
     },
+
+    title: {
+        type: String,
+        default: "New Chat"
+    },
+
     messages: {
         type: [MessageSchema],
         default: []
     }
+
 }, {
     timestamps: true
 });

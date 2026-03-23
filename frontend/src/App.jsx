@@ -4,7 +4,8 @@ import ChatWindow from "./ChatWindow.jsx";
 import { MyContext } from "./MyContext.jsx";
 import { useState } from "react";
 import { v1 as uuidv1 } from "uuid";
-import  "highlight.js/styles/github-dark.css";
+import Login from "./Login.jsx";
+import Signup from "./Signup.jsx";
 
 function App() {
   const [prompt, setPrompt] = useState("");
@@ -13,6 +14,10 @@ function App() {
   const [prevChats, setPrevChats] = useState([]);
   const [newChat, setNewChat] = useState(true);
   const [allThreads, setAllThreads] = useState([]);
+
+  const [authPage, setAuthPage] = useState("login");
+
+  const token = localStorage.getItem("token");
 
   const providerValues = {
     prompt,
@@ -28,6 +33,15 @@ function App() {
     allThreads,
     setAllThreads,
   };
+
+  // 🔐 if not logged in → show auth
+  if (!token) {
+    return authPage === "login" ? (
+      <Login switchToSignup={() => setAuthPage("signup")} />
+    ) : (
+      <Signup switchToLogin={() => setAuthPage("login")} />
+    );
+  }
 
   return (
     <MyContext.Provider value={providerValues}>
