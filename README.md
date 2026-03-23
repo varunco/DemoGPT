@@ -1,37 +1,38 @@
 # 🚀 DemoGPT
 
-A full-stack AI-powered chat application built with the MERN stack, designed to simulate a modern conversational AI experience with support for multiple chat threads and scalable backend architecture.
+A full-stack AI-powered chat application built using the MERN stack, featuring real-time AI conversations, multi-threaded chats, and secure user authentication using JWT.
 
 ---
 
 ## 🧠 Overview
 
-DemoGPT allows users to interact with an AI model through a clean and responsive interface.
-It supports creating, managing, and deleting chat threads while maintaining a smooth user experience.
+DemoGPT is designed to simulate a modern conversational AI platform where users can interact with an AI model in an organized and scalable way.
 
-The project is structured to be easily extendable, with upcoming support for authentication and persistent storage.
+With the addition of JWT authentication, the app now supports secure user sessions and lays the foundation for personalized chat experiences.
 
 ---
 
 ## ✨ Features
 
-* 💬 Real-time AI chat interaction
-* 🧵 Multiple conversation threads
-* 🗑️ Delete chat functionality
-* ⚡ Fast frontend using Vite + React
-* 🔌 RESTful backend using Node.js & Express
-* 🧠 LLM integration (Groq API)
-* 📁 Modular and scalable code structure
+* 💬 AI-powered chat (Groq API)
+* 🧵 Multiple chat threads
+* 🗑️ Delete conversations
+* 🔐 JWT-based Authentication (Login / Signup)
+* 👤 User-specific session handling
+* ⚡ Fast and responsive UI (React + Vite)
+* 🔌 RESTful backend (Node.js + Express)
+* 📁 Modular project structure
 
 ---
 
-## 🔐 Upcoming Features
+## 🔐 Authentication
 
-* ✅ JWT Authentication (login/signup system)
-* 👤 User-specific chat history
-* 🗄️ Database integration (MongoDB)
-* 🌐 Deployment (Vercel / Render)
-* 📱 Improved responsive design
+This project uses **JWT (JSON Web Tokens)** for authentication:
+
+* Users can sign up and log in
+* Tokens are generated on login
+* Protected routes validate user identity
+* Middleware ensures secure access to APIs
 
 ---
 
@@ -48,6 +49,15 @@ The project is structured to be easily extendable, with upcoming support for aut
 * Node.js
 * Express.js
 
+### Database
+
+* MongoDB
+
+### Authentication
+
+* JWT (jsonwebtoken)
+* bcrypt (password hashing)
+
 ### Other Tools
 
 * Groq API (LLM)
@@ -61,12 +71,18 @@ DemoGPT/
 │── backend/
 │   ├── server.js
 │   ├── routes/
-│   ├── controllers/
+│   │   └── Auth.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── models/
+│   │   └── User.js
+│   ├── utils/
 │   └── .env (ignored)
 │
 │── frontend/
 │   ├── src/
 │   ├── components/
+│   ├── utils/
 │   └── main.jsx
 │
 │── .gitignore
@@ -78,7 +94,7 @@ DemoGPT/
 
 ### 1️⃣ Clone Repository
 
-```bash
+```bash id="m0z7hy"
 git clone https://github.com/varunco/DemoGPT.git
 cd DemoGPT
 ```
@@ -87,20 +103,21 @@ cd DemoGPT
 
 ### 2️⃣ Backend Setup
 
-```bash
+```bash id="80ql1z"
 cd backend
 npm install
 ```
 
-Create a `.env` file inside backend:
+Create a `.env` file:
 
-```env
-GROQ_API_KEY=your_api_key_here
+```env id="6v1bks"
+GROQ_API_KEY=your_api_key
+JWT_SECRET=your_secret_key
 ```
 
-Start backend server:
+Start backend:
 
-```bash
+```bash id="3m1w7q"
 node server.js
 ```
 
@@ -108,7 +125,7 @@ node server.js
 
 ### 3️⃣ Frontend Setup
 
-```bash
+```bash id="6nt9e9"
 cd frontend
 npm install
 npm run dev
@@ -118,40 +135,41 @@ npm run dev
 
 ## 🔐 Environment Variables
 
-Create a `.env` file inside the `backend/` directory:
+Inside `backend/.env`:
 
-```
+```id="az7jhb"
 GROQ_API_KEY=your_api_key
+JWT_SECRET=your_secret_key
 ```
 
-⚠️ Never commit your `.env` file to version control.
+⚠️ Never commit `.env` files
 
 ---
 
 ## 🔄 How It Works
 
-1. User enters a prompt in the frontend
-2. Request is sent to backend API
-3. Backend forwards request to Groq API
-4. AI response is returned and displayed
-5. Chat is stored in thread-based structure
+1. User signs up / logs in
+2. Server generates JWT token
+3. Token is sent to frontend
+4. Protected routes verify token
+5. User interacts with AI chat
+6. Backend processes request via Groq API
 
 ---
 
-## 🚀 Future Roadmap
+## 🚀 Future Improvements
 
-* 🔐 JWT-based Authentication
-* 🗄️ MongoDB integration for persistent chats
+* 🧵 Persistent chat storage (MongoDB collections)
+* 🌐 Deployment (Vercel + Render)
+* 📱 Mobile responsiveness improvements
+* 🔄 Refresh tokens / advanced auth flow
 * 🧠 Context-aware conversations
-* 📊 Chat analytics & usage tracking
-* 🌍 Full deployment pipeline
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
-Feel free to fork the repo and submit a pull request.
+Pull requests are welcome. For major changes, open an issue first.
 
 ---
 
