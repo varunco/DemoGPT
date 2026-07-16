@@ -84,7 +84,7 @@ function Sidebar() {
   return (
     <section className={`sidebar ${open ? "" : "collapsed"}`}>
       <div className="top">
-        <img src="/logosq.png" className="logo" />
+        <img src="/logo.png" className="logo" />
         <button className="toggle-btn" onClick={() => setOpen(!open)}>
           <i className="fa-solid fa-bars"></i>
         </button>
