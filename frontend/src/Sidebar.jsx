@@ -3,116 +3,126 @@ import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 import { authFetch } from "./utils/api";
+import { API_URL } from "./config";
 
 function Sidebar() {
-    const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(true);
 
-    const {
-        allThreads,
-        setAllThreads,
-        currThreadId,
-        setNewChat,
-        setPrompt,
-        setReply,
-        setCurrThreadId,
-        setPrevChats,
-        prevChats
-    } = useContext(MyContext);
+  const {
+    allThreads,
+    setAllThreads,
+    currThreadId,
+    setNewChat,
+    setPrompt,
+    setReply,
+    setCurrThreadId,
+    setPrevChats,
+  } = useContext(MyContext);
 
-    const getAllThreads = async () => {
-        try {
-            const response = await authFetch("http://localhost:8080/api/thread");
-            const res = await response.json();
+  const getAllThreads = async () => {
+    try {
+      const response = await authFetch(`${API_URL}/api/thread`);
+      const res = await response.json();
 
-            setAllThreads(res);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+      setAllThreads(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    useEffect(() => {
-        getAllThreads();
-    }, [currThreadId]);
+  useEffect(() => {
+    getAllThreads();
+  }, [currThreadId]);
 
-    const createNewChat = () => {
-        const newId = uuidv1();
-        setCurrThreadId(newId);
-        setNewChat(true);
-        setPrompt("");
-        setReply(null);
-        setPrevChats([]);
-    };
+  const createNewChat = () => {
+    const newId = uuidv1();
 
-    const changeThread = async (newThreadId) => {
-        try {
-            const response = await authFetch(`http://localhost:8080/api/thread/${newThreadId}`);
-            const res = await response.json();
+    setCurrThreadId(newId);
+    setNewChat(true);
+    setPrompt("");
+    setReply(null);
+    setPrevChats([]);
+  };
 
-            setPrevChats(res.messages || []);
-            setCurrThreadId(newThreadId);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+  const changeThread = async (newThreadId) => {
+    try {
+      const response = await authFetch(
+        `${API_URL}/api/thread/${newThreadId}`
+      );
 
-    const deleteThread = async (threadId) => {
-        await authFetch(`http://localhost:8080/api/thread/${threadId}`, {
-            method: "DELETE"
-        });
+      const res = await response.json();
 
-        setAllThreads(prev => prev.filter(t => t.threadId !== threadId));
-    };
+      setPrevChats(res.messages || []);
+      setCurrThreadId(newThreadId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    return (
-        <section className={`sidebar ${open ? "" : "collapsed"}`}>
+  const deleteThread = async (threadId) => {
+    try {
+      await authFetch(`${API_URL}/api/thread/${threadId}`, {
+        method: "DELETE",
+      });
 
-            <div className="top">
-                <img src="src/assets/logosq.png" className="logo" />
-                <button className="toggle-btn" onClick={() => setOpen(!open)}>
-                    <i className="fa-solid fa-bars"></i>
-                </button>
-            </div>
+      setAllThreads((prev) =>
+        prev.filter((t) => t.threadId !== threadId)
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-            {open && (
-                <div className="logo-row" onClick={createNewChat}>
-                    <i className="fa-regular fa-pen-to-square new-chat"></i>
-                    <h4>New Chat</h4>
-                </div>
-            )}
+  return (
+    <section className={`sidebar ${open ? "" : "collapsed"}`}>
+      <div className="top">
+        <img src="/logosq.png" className="logo" />
+        <button className="toggle-btn" onClick={() => setOpen(!open)}>
+          <i className="fa-solid fa-bars"></i>
+        </button>
+      </div>
 
-            <div className="chats-section">
-                {open && <p className="section-title">Your chats</p>}
+      {open && (
+        <div className="logo-row" onClick={createNewChat}>
+          <i className="fa-regular fa-pen-to-square new-chat"></i>
+          <h4>New Chat</h4>
+        </div>
+      )}
 
-                {open && (
-                    <ul className="history">
-                        {allThreads?.map(thread => (
-                            <li
-                                key={thread.threadId}
-                                onClick={() => changeThread(thread.threadId)}
-                                className={thread.threadId === currThreadId ? "active" : ""}
-                            >
-                                <span>{thread.title}</span>
+      <div className="chats-section">
+        {open && <p className="section-title">Your chats</p>}
 
-                                <i
-                                    className="fa-solid fa-trash"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteThread(thread.threadId);
-                                    }}
-                                ></i>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+        {open && (
+          <ul className="history">
+            {allThreads?.map((thread) => (
+              <li
+                key={thread.threadId}
+                onClick={() => changeThread(thread.threadId)}
+                className={
+                  thread.threadId === currThreadId ? "active" : ""
+                }
+              >
+                <span>{thread.title}</span>
 
-            <div className="sign">
-                <div className="avatar">VJ</div>
-                {open && <span>Varun Juneja</span>}
-            </div>
+                <i
+                  className="fa-solid fa-trash"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteThread(thread.threadId);
+                  }}
+                ></i>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-        </section>
-    );
+      <div className="sign">
+        <div className="avatar">VJ</div>
+        {open && <span>Varun Juneja</span>}
+      </div>
+    </section>
+  );
 }
 
 export default Sidebar;
