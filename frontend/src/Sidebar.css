@@ -18,14 +18,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow:
+    0 8px 25px rgba(79, 156, 255, 0.35);
 }
-
 .toggle-btn {
   background: transparent;
   border: none;

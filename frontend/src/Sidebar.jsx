@@ -4,6 +4,7 @@ import { MyContext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 import { authFetch } from "./utils/api";
 import { API_URL } from "./config";
+import logo from "./logo.png";
 
 function Sidebar() {
   const [open, setOpen] = useState(true);
@@ -84,30 +85,49 @@ function Sidebar() {
   return (
     <section className={`sidebar ${open ? "" : "collapsed"}`}>
       <div className="top">
-        <img src="/logo.png" className="logo" />
-        <button className="toggle-btn" onClick={() => setOpen(!open)}>
+        <img
+          src={logo}
+          className="logo"
+          alt="DemoGPT Logo"
+        />
+
+        <button
+          className="toggle-btn"
+          onClick={() => setOpen(!open)}
+        >
           <i className="fa-solid fa-bars"></i>
         </button>
       </div>
 
       {open && (
-        <div className="logo-row" onClick={createNewChat}>
-          <i className="fa-regular fa-pen-to-square new-chat"></i>
+        <div
+          className="logo-row"
+          onClick={createNewChat}
+        >
+          <i className="fa-regular fa-pen-to-square"></i>
           <h4>New Chat</h4>
         </div>
       )}
 
       <div className="chats-section">
-        {open && <p className="section-title">Your Chats</p>}
+        {open && (
+          <p className="section-title">
+            Your Chats
+          </p>
+        )}
 
         {open && (
           <ul className="history">
             {allThreads?.map((thread) => (
               <li
                 key={thread.threadId}
-                onClick={() => changeThread(thread.threadId)}
+                onClick={() =>
+                  changeThread(thread.threadId)
+                }
                 className={
-                  thread.threadId === currThreadId ? "active" : ""
+                  thread.threadId === currThreadId
+                    ? "active"
+                    : ""
                 }
               >
                 <span>{thread.title}</span>
@@ -126,7 +146,10 @@ function Sidebar() {
       </div>
 
       <div className="sign">
-        <div className="avatar">{initials}</div>
+        <div className="avatar">
+          {initials}
+        </div>
+
         {open && <span>{name}</span>}
       </div>
     </section>
