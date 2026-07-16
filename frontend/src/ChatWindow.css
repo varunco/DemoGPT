@@ -1,149 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 .chatWindow {
-    background-color: #0f0f0f;
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-    color: #e6e6e6;
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #0b0f14;
 }
 
-/* navbar */
-
 .navbar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  height: 70px;
+  padding: 0 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(11,15,20,.6);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.04);
 }
 
 .navbar span {
-    margin: 1rem 2rem;
-    font-weight: 500;
-    color: #ffffff;
-}
-
-.userIconDiv {
-    margin: 1rem 2rem;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .userIcon {
-    background: linear-gradient(135deg, #4f9cff, #7c5cff);
-    height: 28px;
-    width: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#4f9cff,#7c5cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* chat input */
-
 .chatInput {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  padding: 25px;
 }
 
 .inputBox {
-    width: 100%;
-    position: relative;
-    max-width: 700px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  max-width: 850px;
+  margin: auto;
+  position: relative;
 }
 
-input {
-    width: 100%;
-    border: none;
-    background-color: #1a1a1a;
-    padding: 18px 20px;
-    font-size: 0.9rem;
-    border-radius: 12px;
-    color: #ffffff;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
-    transition: all 0.2s ease;
+.inputBox input {
+  width: 100%;
+  background: rgba(30,30,30,.9);
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 24px;
+  padding: 20px 65px 20px 24px;
+  color: white;
+  font-size: 15px;
+  backdrop-filter: blur(20px);
 }
 
-input::placeholder {
-    color: #888;
+.inputBox input:focus {
+  outline: none;
+  border-color: #4f9cff;
 }
-
-input:focus {
-    outline: none;
-    box-shadow: 0 0 0 1px #4f9cff;
-}
-
-/* send button */
 
 #submit {
-    cursor: pointer;
-    height: 35px;
-    width: 35px;
-    font-size: 18px;
-    position: absolute;
-    right: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa;
-    transition: 0.2s;
-}
-
-#submit:hover {
-    color: #ffffff;
-    transform: scale(1.1);
-}
-
-.info {
-    font-size: 0.75rem;
-    padding: 0.5rem;
-    color: #888;
-}
-
-/* dropdown */
-
-.dropDown {
-    position: absolute;
-    top: 4rem;
-    right: 4rem;
-    width: 160px;
-
-    background-color: #1a1a1a;
-    padding: 0.4rem 0.5rem;
-    border-radius: 10px;
-    text-align: left;
-    z-index: 1000;
-    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.dropDownItem {
-    font-size: 0.85rem;
-    margin: 0.3rem 0rem;
-    padding: 0.5rem 0.4rem;
-    cursor: pointer;
-    color: #ddd;
-    border-radius: 6px;
-    transition: 0.2s;
-}
-
-.dropDownItem:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-}
-.chatWindow {
-    position: relative;
-    flex: 1;          /* 🔥 THIS IS KEY */
-    display: flex;
-    flex-direction: column;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#4f9cff,#7c5cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
 }

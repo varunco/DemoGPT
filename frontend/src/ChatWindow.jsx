@@ -70,35 +70,36 @@ function ChatWindow() {
 
   return (
     <div className="chatWindow">
+      {/* NAVBAR */}
       <div className="navbar">
-        <span>DemoGPT</span>
+        <span>✨ DemoGPT</span>
 
         <div
           className="userIconDiv"
           onClick={() => setIsOpen((prev) => !prev)}
         >
-          <span className="userIcon">
+          <div className="userIcon">
             <i className="fa-solid fa-user"></i>
-          </span>
+          </div>
         </div>
       </div>
 
+      {/* DROPDOWN */}
       {isOpen && (
         <div className="dropDown">
           <div className="dropDownItem" onClick={logout}>
-            <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
+            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+            &nbsp; Log out
           </div>
         </div>
       )}
 
-      {isEmpty && (
+      {/* EMPTY STATE */}
+      {isEmpty && !loading && (
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
+            inset: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -107,25 +108,73 @@ function ChatWindow() {
             pointerEvents: "none",
           }}
         >
-          {!loading && (
-            <h1 style={{ color: "#fff", fontSize: "42px" }}>
-              Start a New Chat!
-            </h1>
-          )}
+          <div
+            style={{
+              width: "90px",
+              height: "90px",
+              borderRadius: "24px",
+              background:
+                "linear-gradient(135deg,#4f9cff,#7c5cff)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "38px",
+              boxShadow: "0 20px 50px rgba(79,156,255,.25)",
+            }}
+          >
+            ✨
+          </div>
 
-          {loading && <SyncLoader color="#fff" />}
+          <h1
+            style={{
+              color: "#fff",
+              fontSize: "52px",
+              fontWeight: "700",
+            }}
+          >
+            DemoGPT
+          </h1>
+
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "18px",
+            }}
+          >
+            How can I help you today?
+          </p>
         </div>
       )}
 
+      {/* LOADING STATE */}
+      {loading && isEmpty && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pointerEvents: "none",
+          }}
+        >
+          <SyncLoader color="#4f9cff" />
+        </div>
+      )}
+
+      {/* CHAT */}
       <Chat />
 
+      {/* INPUT */}
       <div className="chatInput">
         <div className="inputBox">
           <input
-            placeholder="Ask anything"
+            placeholder="Message DemoGPT..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && getReply()}
+            onKeyDown={(e) =>
+              e.key === "Enter" && getReply()
+            }
           />
 
           <div id="submit" onClick={getReply}>
