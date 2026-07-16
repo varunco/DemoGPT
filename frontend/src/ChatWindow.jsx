@@ -74,6 +74,7 @@ function ChatWindow() {
   localStorage.removeItem("token");
   localStorage.removeItem("name");
   localStorage.removeItem("email");
+
   window.location.reload();
 };
 

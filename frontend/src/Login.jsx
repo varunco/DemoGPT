@@ -3,59 +3,57 @@ import { useState } from "react";
 import { API_URL } from "./config";
 
 function Login({ switchToSignup }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
-        localStorage.setItem("token", data.token);
+      if (data.token) {
+        localStorage.setItem(
+          "token",
+          data.token
+        );
 
-        if (data.user) {
-          localStorage.setItem(
-            "name",
-            data.user.name || "User"
-          );
+        localStorage.setItem(
+          "name",
+          data.user.name
+        );
 
-          localStorage.setItem(
-            "email",
-            data.user.email || ""
-          );
-        }
+        localStorage.setItem(
+          "email",
+          data.user.email
+        );
 
         window.location.reload();
       } else {
-        alert(data.error || "Login failed");
+        alert(data.error);
       }
     } catch (err) {
       console.log(err);
-      alert("Something went wrong.");
+      alert("Login failed");
     }
-
-    setLoading(false);
   };
 
   return (
@@ -66,7 +64,7 @@ function Login({ switchToSignup }) {
         </h2>
 
         <p className="auth-subtitle">
-          Login to continue to DemoGPT
+          Login to continue
         </p>
 
         <form
@@ -76,7 +74,7 @@ function Login({ switchToSignup }) {
           <input
             className="auth-input"
             type="email"
-            placeholder="Email Address"
+            placeholder="Email"
             value={email}
             onChange={(e) =>
               setEmail(e.target.value)
@@ -89,17 +87,14 @@ function Login({ switchToSignup }) {
             placeholder="Password"
             value={password}
             onChange={(e) =>
-              setPassword(e.target.value)
+              setPassword(
+                e.target.value
+              )
             }
           />
 
-          <button
-            className="auth-btn"
-            disabled={loading}
-          >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+          <button className="auth-btn">
+            Login
           </button>
         </form>
 

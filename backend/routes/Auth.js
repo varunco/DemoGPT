@@ -1,115 +1,122 @@
-import "./Auth.css";
-import { useState } from "react";
-import { API_URL } from "./config";
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-function Login({ switchToSignup }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+const router = express.Router();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+/* =========================
+   SIGNUP
+========================= */
 
-    try {
-      const res = await fetch(
-        `${API_URL}/api/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
+router.post("/signup", async (req, res) => {
+  const { name, email, password } = req.body;
 
-      const data = await res.json();
-
-      if (data.token) {
-        localStorage.setItem(
-          "token",
-          data.token
-        );
-
-        localStorage.setItem(
-          "name",
-          data.user.name
-        );
-
-        localStorage.setItem(
-          "email",
-          data.user.email
-        );
-
-        window.location.reload();
-      } else {
-        alert(
-          data.error || "Login failed"
-        );
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Login failed");
+  try {
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        error: "Missing fields",
+      });
     }
-  };
 
-  return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2 className="auth-title">
-          Welcome Back
-        </h2>
+    const existingUser = await User.findOne({
+      email,
+    });
 
-        <p className="auth-subtitle">
-          Login to continue
-        </p>
+    if (existingUser) {
+      return res.status(400).json({
+        error: "User already exists",
+      });
+    }
 
-        <form
-          className="auth-form"
-          onSubmit={handleLogin}
-        >
-          <input
-            className="auth-input"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
-          />
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
 
-          <input
-            className="auth-input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
-          />
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-          <button className="auth-btn">
-            Login
-          </button>
-        </form>
+    await user.save();
 
-        <p className="auth-footer">
-          Don't have an account?
-          <span
-            className="auth-link"
-            onClick={switchToSignup}
-          >
-            Sign up
-          </span>
-        </p>
-      </div>
-    </div>
-  );
-}
+    res.json({
+      message: "User created successfully",
+    });
+  } catch (err) {
+    console.log("SIGNUP ERROR:", err);
 
-export default Login;
+    res.status(500).json({
+      error: "Signup failed",
+    });
+  }
+});
+
+/* =========================
+   LOGIN
+========================= */
+
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res.status(400).json({
+        error: "Missing fields",
+      });
+    }
+
+    const user = await User.findOne({
+      email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found",
+      });
+    }
+
+    if (!user.password) {
+      return res.status(500).json({
+        error: "User has no password",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isMatch) {
+      return res.status(400).json({
+        error: "Invalid credentials",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.json({
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.log("LOGIN ERROR:", err);
+
+    res.status(500).json({
+      error: "Login failed",
+    });
+  }
+});
+
+export default router;
