@@ -1,82 +1,115 @@
-import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import "./Auth.css";
+import { useState } from "react";
+import { API_URL } from "./config";
 
-const router = express.Router();
+function Login({ switchToSignup }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] =
+    useState("");
 
-
-// ✅ SIGNUP ROUTE (ADD THIS)
-router.post("/signup", async (req, res) => {
-    const { name, email, password } = req.body;
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
     try {
-        if (!name || !email || !password) {
-            return res.status(400).json({ error: "Missing fields" });
-        }
-
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({ error: "User already exists" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = new User({
-            name,
+      const res = await fetch(
+        `${API_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
             email,
-            password: hashedPassword
-        });
-
-        await user.save();
-
-        res.json({ message: "User created successfully" });
-
-    } catch (err) {
-        console.log("SIGNUP ERROR:", err);
-        res.status(500).json({ error: "Signup failed" });
-    }
-});
-
-
-// ✅ LOGIN ROUTE (your existing one)
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        if (!email || !password) {
-            return res.status(400).json({ error: "Missing fields" });
+            password,
+          }),
         }
+      );
 
-        const user = await User.findOne({ email });
+      const data = await res.json();
 
-        if (!user) {
-            return res.status(400).json({ error: "User not found" });
-        }
-
-        if (!user.password) {
-            return res.status(500).json({ error: "User has no password" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(400).json({ error: "Invalid credentials" });
-        }
-
-        const token = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
+      if (data.token) {
+        localStorage.setItem(
+          "token",
+          data.token
         );
 
-        res.json({ token });
+        localStorage.setItem(
+          "name",
+          data.user.name
+        );
 
+        localStorage.setItem(
+          "email",
+          data.user.email
+        );
+
+        window.location.reload();
+      } else {
+        alert(
+          data.error || "Login failed"
+        );
+      }
     } catch (err) {
-        console.log("LOGIN ERROR:", err);
-        res.status(500).json({ error: "Login failed" });
+      console.log(err);
+      alert("Login failed");
     }
-});
+  };
 
-export default router;
+  return (
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">
+          Welcome Back
+        </h2>
+
+        <p className="auth-subtitle">
+          Login to continue
+        </p>
+
+        <form
+          className="auth-form"
+          onSubmit={handleLogin}
+        >
+          <input
+            className="auth-input"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+          />
+
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+          />
+
+          <button className="auth-btn">
+            Login
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Don't have an account?
+          <span
+            className="auth-link"
+            onClick={switchToSignup}
+          >
+            Sign up
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default Login;

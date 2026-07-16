@@ -19,11 +19,19 @@ function Sidebar() {
     setPrevChats,
   } = useContext(MyContext);
 
+  const name = localStorage.getItem("name") || "User";
+
+  const initials = name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   const getAllThreads = async () => {
     try {
       const response = await authFetch(`${API_URL}/api/thread`);
       const res = await response.json();
-
       setAllThreads(res);
     } catch (err) {
       console.log(err);
@@ -90,7 +98,7 @@ function Sidebar() {
       )}
 
       <div className="chats-section">
-        {open && <p className="section-title">Your chats</p>}
+        {open && <p className="section-title">Your Chats</p>}
 
         {open && (
           <ul className="history">
@@ -118,8 +126,8 @@ function Sidebar() {
       </div>
 
       <div className="sign">
-        <div className="avatar">VJ</div>
-        {open && <span>Varun Juneja</span>}
+        <div className="avatar">{initials}</div>
+        {open && <span>{name}</span>}
       </div>
     </section>
   );

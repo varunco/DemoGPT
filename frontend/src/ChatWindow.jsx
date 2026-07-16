@@ -20,6 +20,15 @@ function ChatWindow() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const name = localStorage.getItem("name") || "User";
+
+  const initials = name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   const getReply = async () => {
     if (!prompt.trim()) return;
 
@@ -62,15 +71,16 @@ function ChatWindow() {
   }, [reply]);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
+  localStorage.removeItem("token");
+  localStorage.removeItem("name");
+  localStorage.removeItem("email");
+  window.location.reload();
+};
 
   const isEmpty = !prevChats || prevChats.length === 0;
 
   return (
     <div className="chatWindow">
-      {/* NAVBAR */}
       <div className="navbar">
         <span>✨ DemoGPT</span>
 
@@ -78,13 +88,10 @@ function ChatWindow() {
           className="userIconDiv"
           onClick={() => setIsOpen((prev) => !prev)}
         >
-          <div className="userIcon">
-            <i className="fa-solid fa-user"></i>
-          </div>
+          <div className="userIcon">{initials}</div>
         </div>
       </div>
 
-      {/* DROPDOWN */}
       {isOpen && (
         <div className="dropDown">
           <div className="dropDownItem" onClick={logout}>
@@ -94,8 +101,7 @@ function ChatWindow() {
         </div>
       )}
 
-      {/* EMPTY STATE */}
-      {isEmpty && !loading && (
+      {isEmpty && (
         <div
           style={{
             position: "absolute",
@@ -104,77 +110,46 @@ function ChatWindow() {
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
-            gap: "16px",
+            gap: "18px",
             pointerEvents: "none",
           }}
         >
-          <div
-            style={{
-              width: "90px",
-              height: "90px",
-              borderRadius: "24px",
-              background:
-                "linear-gradient(135deg,#4f9cff,#7c5cff)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "38px",
-              boxShadow: "0 20px 50px rgba(79,156,255,.25)",
-            }}
-          >
-            ✨
-          </div>
+          {!loading && (
+            <>
+              <h1
+                style={{
+                  color: "#fff",
+                  fontSize: "54px",
+                  fontWeight: 700,
+                }}
+              >
+                ✨ DemoGPT
+              </h1>
 
-          <h1
-            style={{
-              color: "#fff",
-              fontSize: "52px",
-              fontWeight: "700",
-            }}
-          >
-            DemoGPT
-          </h1>
+              <p
+                style={{
+                  color: "#9ca3af",
+                  fontSize: "18px",
+                }}
+              >
+                How can I help you today?
+              </p>
+            </>
+          )}
 
-          <p
-            style={{
-              color: "#9ca3af",
-              fontSize: "18px",
-            }}
-          >
-            How can I help you today?
-          </p>
+          {loading && <SyncLoader color="#4f9cff" />}
         </div>
       )}
 
-      {/* LOADING STATE */}
-      {loading && isEmpty && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "none",
-          }}
-        >
-          <SyncLoader color="#4f9cff" />
-        </div>
-      )}
-
-      {/* CHAT */}
       <Chat />
 
-      {/* INPUT */}
       <div className="chatInput">
         <div className="inputBox">
           <input
             placeholder="Message DemoGPT..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && getReply()
-            }
+            onKeyDown={(e) => e.key === "Enter" && getReply()}
           />
 
           <div id="submit" onClick={getReply}>
