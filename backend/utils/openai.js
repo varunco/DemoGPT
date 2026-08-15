@@ -8,10 +8,10 @@ const getOpenAIAPIResponse = async (message) => {
       "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
     },
     body: JSON.stringify({
-      "model": "llama-3.3-70b-versatile",
-      "messages": [
+      model: "openai/gpt-oss-120b",
+      messages: [
         {
-          "role": "user",
+          role: "user",
           content: message,
         }
       ]
@@ -19,9 +19,13 @@ const getOpenAIAPIResponse = async (message) => {
   };
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", options);
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      options
+    );
+
     const data = await response.json();
-    
+
     return data.choices[0].message.content;
   } catch (err) {
     console.log(err);
