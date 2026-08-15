@@ -9,9 +9,12 @@ const client = new OpenAI({
 async function main() {
   try {
     const response = await client.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-120b",
       messages: [
-        { role: "user", content: "Differences between  SQL and MongoDb" }
+        {
+          role: "user",
+          content: "Differences between SQL and MongoDB",
+        },
       ],
     });
 
